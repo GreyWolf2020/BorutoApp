@@ -26,6 +26,10 @@ val Colors.welcomeScreenBackgroundColor
         Color.Black
     }
 
+val Colors.statusBar
+    @Composable
+    get() = if (isLight) Purple700 else Color.Black
+
 val Colors.titleColor
     @Composable
     get() = if (isLight) DarkGray

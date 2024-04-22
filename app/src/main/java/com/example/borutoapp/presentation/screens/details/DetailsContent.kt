@@ -1,6 +1,8 @@
 package com.example.borutoapp.presentation.screens.details
 
+import android.graphics.Color.parseColor
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.BottomSheetValue
@@ -26,16 +29,24 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
@@ -44,44 +55,75 @@ import com.example.borutoapp.R
 import com.example.borutoapp.domain.model.Hero
 import com.example.borutoapp.presentation.common.InfoBox
 import com.example.borutoapp.presentation.components.OrderedList
+import com.example.borutoapp.ui.theme.EXPANDED_RADIUS_LEVEL
+import com.example.borutoapp.ui.theme.EXTRA_LARGE_PADDING
 import com.example.borutoapp.ui.theme.INFO_ICON_SIZE
 import com.example.borutoapp.ui.theme.LARGE_PADDING
 import com.example.borutoapp.ui.theme.MEDIUM_PADDING
+import com.example.borutoapp.ui.theme.MIN_IMAGE_HEIGHT
 import com.example.borutoapp.ui.theme.MIN_SHEET_HEIGHT
+import com.example.borutoapp.ui.theme.REQUIRE_OFFSETMAX
+import com.example.borutoapp.ui.theme.REQUIRE_OFFSETMIN
 import com.example.borutoapp.ui.theme.SMALL_PADDING
 import com.example.borutoapp.ui.theme.titleColor
 import com.example.borutoapp.util.Constants.ABOUT_TEXT_MAX_LINES
 import com.example.borutoapp.util.Constants.BASE_URL
-import kotlin.math.absoluteValue
-import kotlin.math.sign
-import kotlin.math.ulp
-import kotlin.math.withSign
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DetailsContent(
     navController: NavHostController,
-    selectedHero: Hero?
+    selectedHero: Hero?,
+    colors: Map<String, String> = mapOf("vibrant" to Integer.toHexString(MaterialTheme.colors.primary.toArgb()), "darkVibrant" to Integer.toHexString(MaterialTheme.colors.surface.toArgb()), "onDarkVibrant" to Integer.toHexString(MaterialTheme.colors.titleColor.toArgb()))
 ) {
+    var vibrant by remember {
+        mutableStateOf("#000000")
+    }
+    var darkVibrant by remember {
+        mutableStateOf("#000000")
+    }
+    var onDarkVibrant by remember {
+        mutableStateOf("#FFFFFF")
+    }
+    LaunchedEffect(key1 = selectedHero) {
+        vibrant = colors["vibrant"]!!
+        darkVibrant = colors["darkVibrant"]!!
+        onDarkVibrant = colors["onDarkVibrant"]!!
+    }
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(
+        color = Color(parseColor(darkVibrant))
+    )
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     )
-    val currentSheetFraction = scaffoldState.currentSheetFraction
+    val topCornerDp by animateDpAsState(targetValue = if (scaffoldState.bottomSheetState.isCollapsed) EXTRA_LARGE_PADDING else EXPANDED_RADIUS_LEVEL)
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = MIN_SHEET_HEIGHT,
+        sheetShape = RoundedCornerShape(
+            topEnd = topCornerDp,
+            topStart = topCornerDp
+        ),
         sheetContent = {
             selectedHero?.let { hero ->
-                BottomSheetContent(selectedHero = hero)
+                BottomSheetContent(
+                    selectedHero = hero,
+                    infoBoxIconColor = Color(parseColor(vibrant)),
+                    sheetBackgroundColor = Color(parseColor(darkVibrant)),
+                    contentColor = Color(parseColor(onDarkVibrant))
+                )
             }
         },
         content = {
             selectedHero?.let { hero ->
                 BackgroundContent(
-                    imageFraction = currentSheetFraction,
                     heroImage = hero.image,
-                    onClosedClicked = navController::popBackStack
+                    imageFraction = scaffoldState.currentSheetFraction,
+                    onClosedClicked = navController::popBackStack,
+                    backgroundColor = Color(parseColor(darkVibrant))
                 )
             }
         }
@@ -89,6 +131,14 @@ fun DetailsContent(
     )
 
 }
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun BottomSheetScaffoldState.topCornerRadius(): State<Dp> = animateDpAsState(
+    targetValue = if (currentSheetFraction == 1f) EXTRA_LARGE_PADDING
+    else
+        EXPANDED_RADIUS_LEVEL
+)
 
 @Composable
 fun BottomSheetContent(
@@ -193,11 +243,11 @@ fun BottomSheetContent(
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
+@OptIn(ExperimentalCoilApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun BackgroundContent(
     heroImage: String,
-    imageFraction: Float = 1f,
+    imageFraction: Float,
     backgroundColor: Color = MaterialTheme.colors.background,
     onClosedClicked: () -> Unit
 ) {
@@ -212,7 +262,7 @@ fun BackgroundContent(
         Image(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(imageFraction)
+                .fillMaxHeight(imageFraction + MIN_IMAGE_HEIGHT)
                 .align(Alignment.TopStart),
             painter = painter, 
             contentDescription = stringResource(id = R.string.hero_image),
@@ -243,20 +293,20 @@ fun BackgroundContent(
 @OptIn(ExperimentalMaterialApi::class)
 val BottomSheetScaffoldState.currentSheetFraction: Float
     get() {
-        Log.d("DetailsContent", "Current value = ${bottomSheetState.progress}")
-        Log.d("DetailsContent", "Collapsed = ${1f - bottomSheetState.progress}")
-        Log.d("DetailsContent", "Expanded = ${0f + bottomSheetState.progress}")
-        Log.d("DetailsContent", "Direction = ${0f + bottomSheetState.requireOffset()}")
-
-
-        return when {
-            bottomSheetState.progress < 1f && bottomSheetState.isCollapsed -> 1f - bottomSheetState.progress
-            bottomSheetState.progress < 1f  && bottomSheetState.isExpanded -> 0f + bottomSheetState.progress
-            bottomSheetState.isCollapsed -> 1f
-            bottomSheetState.isExpanded  -> 0f
-            else -> bottomSheetState.progress
-        }
+        Log.d("DetailsContent", "fraction = ${bottomSheetState.requireOffset().scale( REQUIRE_OFFSETMIN, REQUIRE_OFFSETMAX, 0f, 1f )}")
+        return bottomSheetState.requireOffset().scale(  0f, 1f , REQUIRE_OFFSETMIN, REQUIRE_OFFSETMAX,)
     }
+
+fun Float.scale(
+    y1: Float,
+    y2: Float,
+    x1: Float,
+    x2: Float
+): Float {
+    val m = (y1 - y2) / (x1 - x2)
+    val c = m * (0 - x2) + y2
+    return ((m * this) + c)
+}
 
 @Composable
 @Preview
