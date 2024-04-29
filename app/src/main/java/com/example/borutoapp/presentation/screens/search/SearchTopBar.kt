@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +41,7 @@ fun SearchTopBar(
 ) = SearchWidget(
     text = text,
     onTextChange = onTextChange,
-    onSearchClicked =onSearchClicked,
+    onSearchClicked = onSearchClicked,
     onClosedClicked = onClosedClicked
 )
 
@@ -53,15 +55,21 @@ fun SearchWidget(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(TOP_APP_BAR_HEIGHT),
+            .height(TOP_APP_BAR_HEIGHT)
+            .semantics {
+                contentDescription = "SearchWidget"
+            },
         elevation = AppBarDefaults.TopAppBarElevation,
         color = MaterialTheme.colors.topAppBarBackgroundColor
     ) {
         TextField(
             modifier = Modifier
-                .fillMaxWidth(),
-            value =text,
-            onValueChange = {onTextChange(it)},
+                .fillMaxWidth()
+                .semantics {
+                    contentDescription = "TextField"
+                },
+            value = text,
+            onValueChange = { onTextChange(it) },
             placeholder = {
                 Text(
                     modifier = Modifier
@@ -89,11 +97,14 @@ fun SearchWidget(
             },
             trailingIcon = {
                 IconButton(
+                    modifier = Modifier.semantics {
+                        contentDescription = "CloseButton"
+                    },
                     onClick = {
-                        if (text.isNotEmpty()) onTextChange("")else onClosedClicked()
-                    } ,
+                        if (text.isNotEmpty()) onTextChange("") else onClosedClicked()
+                    },
 
-                ) {
+                    ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.close_icon),

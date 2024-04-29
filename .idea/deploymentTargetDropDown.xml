@@ -2,7 +2,22 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="RatingWidgetTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="passInvalid_Assert_FiveEmptyStar()">
+        <State />
+      </entry>
+      <entry key="passNegativeValue_Assert_FiveEmptyStar()">
+        <State />
+      </entry>
+      <entry key="passZeroPointSixValue_Assert_FourEmptyStarsOneFilledStar()">
+        <State />
+      </entry>
+      <entry key="passZeroPointZeroValue_Assert_FiveEmptyStars()">
         <State />
       </entry>
     </value>

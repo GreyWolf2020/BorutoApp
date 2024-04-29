@@ -9,7 +9,7 @@ object Constants {
     const val PREFERENCE_NAME = "boruto_preferences"
     const val PREFERENCES_KEY = "onboarding_completed"
 
-    const val IP_ADDRESS = "192.168.2.65" // assign the IP Address to IP_ADDRESS constant variable, the variable of String type.
+    const val IP_ADDRESS = "192.168.47.65" // assign the IP Address to IP_ADDRESS constant variable, the variable of String type.
 
     const val BASE_URL = "http://${IP_ADDRESS}:8080"
 
