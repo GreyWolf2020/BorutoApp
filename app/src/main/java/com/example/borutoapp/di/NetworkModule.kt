@@ -13,10 +13,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+
 @OptIn(ExperimentalPagingApi::class)
 @Module
 @InstallIn(SingletonComponent::class)
@@ -34,7 +35,7 @@ object NetworkModule {
     @OptIn(ExperimentalSerializationApi::class)
     @Provides
     fun provideRetrofitInstance(okHttpClient: OkHttpClient): Retrofit {
-        val contentType = MediaType.get("application/json")
+        val contentType = "application/json".toMediaType()
         return Retrofit
             .Builder()
             .baseUrl(BASE_URL)

@@ -5,7 +5,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -26,13 +32,20 @@ import androidx.navigation.NavHostController
 import com.example.borutoapp.R
 import com.example.borutoapp.domain.model.OnboardingPage
 import com.example.borutoapp.navigation.Screen
-import com.example.borutoapp.ui.theme.*
+import com.example.borutoapp.presentation.components.HorizontalPagerIndicator
+import com.example.borutoapp.ui.theme.EXTRA_LARGE_PADDING
+import com.example.borutoapp.ui.theme.PAGING_INDICATOR_WIDTH
+import com.example.borutoapp.ui.theme.SMALL_PADDING
+import com.example.borutoapp.ui.theme.activeIndicatorColor
+import com.example.borutoapp.ui.theme.buttonBackgroundColor
+import com.example.borutoapp.ui.theme.descriptionColor
+import com.example.borutoapp.ui.theme.inactiveIndicatorColor
+import com.example.borutoapp.ui.theme.titleColor
+import com.example.borutoapp.ui.theme.welcomeScreenBackgroundColor
 import com.example.borutoapp.util.Constants.LAST_ONBOARDING_PAGE
 import com.example.borutoapp.util.Constants.ONBOARDING_PAGE_COUNT
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPagerIndicator
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WelcomeScreen (
     navController: NavHostController,
@@ -44,7 +57,9 @@ fun WelcomeScreen (
         OnboardingPage.Third
     )
 
-    val pageState = rememberPagerState()
+    val pageState = rememberPagerState(
+        pageCount = { ONBOARDING_PAGE_COUNT }
+    )
 
     Column(
         modifier = Modifier
@@ -55,11 +70,11 @@ fun WelcomeScreen (
             modifier = Modifier
                 .weight(10f),
             state = pageState,
-            pageCount = ONBOARDING_PAGE_COUNT,
             verticalAlignment = Alignment.Top
         ) { page ->
             PagerScreen(onboardingPage = pages[page])
         }
+
         HorizontalPagerIndicator(
             modifier = Modifier
                 .weight(1f)
@@ -68,7 +83,6 @@ fun WelcomeScreen (
             pageCount = pages.size,
             activeColor = MaterialTheme.colors.activeIndicatorColor,
             inactiveColor = MaterialTheme.colors.inactiveIndicatorColor,
-            spacing = PAGING_INDICATOR_SPACING,
             indicatorWidth = PAGING_INDICATOR_WIDTH
         )
         FinishButton(

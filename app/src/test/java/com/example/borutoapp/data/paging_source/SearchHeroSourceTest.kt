@@ -5,7 +5,7 @@ import com.example.borutoapp.data.local.paging_source.SearchHeroesSource
 import com.example.borutoapp.data.remote.BorutoApi
 import com.example.borutoapp.data.remote.FakeRemoteApi
 import com.example.borutoapp.domain.model.Hero
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -109,6 +109,7 @@ class SearchHeroSourceTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `Search api with existing hero name, expect single hero result, assert loadResult_Page`() = runTest {
         val heroSource = SearchHeroesSource(borutoApi, query = "Sasuke")
@@ -129,6 +130,7 @@ class SearchHeroSourceTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `Search api with existing hero name, expect multiple heroes result, assert loadResult_Page`() = runTest {
         val heroSource = SearchHeroesSource(borutoApi, query = "Sa")
@@ -152,6 +154,7 @@ class SearchHeroSourceTest {
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `Search api with empty name, assert empy heroes list and loadResult_Page`() = runTest {
         val heroSource = SearchHeroesSource(borutoApi, query = "")
@@ -171,6 +174,7 @@ class SearchHeroSourceTest {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `Search api with unknown name, assert empy heroes list and loadResult_Page`() = runTest {
         val heroSource = SearchHeroesSource(borutoApi, query = "Unkown")

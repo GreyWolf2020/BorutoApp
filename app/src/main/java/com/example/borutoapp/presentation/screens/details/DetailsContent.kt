@@ -1,5 +1,6 @@
 package com.example.borutoapp.presentation.screens.details
 
+import android.app.Activity
 import android.graphics.Color.parseColor
 import android.util.Log
 import androidx.compose.animation.core.animateDpAsState
@@ -30,6 +31,7 @@ import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +43,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,7 +53,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.borutoapp.R
 import com.example.borutoapp.domain.model.Hero
 import com.example.borutoapp.presentation.common.InfoBox
@@ -65,10 +69,10 @@ import com.example.borutoapp.ui.theme.MIN_SHEET_HEIGHT
 import com.example.borutoapp.ui.theme.REQUIRE_OFFSETMAX
 import com.example.borutoapp.ui.theme.REQUIRE_OFFSETMIN
 import com.example.borutoapp.ui.theme.SMALL_PADDING
+import com.example.borutoapp.ui.theme.statusBar
 import com.example.borutoapp.ui.theme.titleColor
 import com.example.borutoapp.util.Constants.ABOUT_TEXT_MAX_LINES
 import com.example.borutoapp.util.Constants.BASE_URL
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -91,10 +95,12 @@ fun DetailsContent(
         darkVibrant = colors["darkVibrant"]!!
         onDarkVibrant = colors["onDarkVibrant"]!!
     }
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(
-        color = Color(parseColor(darkVibrant))
-    )
+    val activity = LocalContext.current as Activity
+    val systemColor = MaterialTheme.colors.statusBar.toArgb()
+    SideEffect {
+        activity.window.statusBarColor = systemColor
+    }
+
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     )
@@ -252,9 +258,14 @@ fun BackgroundContent(
     onClosedClicked: () -> Unit
 ) {
     val imageUrl = "$BASE_URL${heroImage}"
-    val painter = rememberImagePainter(imageUrl) {
-        error(R.drawable.ic_placeholder)
-    }
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest
+            .Builder(LocalContext.current)
+            .data(imageUrl)
+            .error(R.drawable.ic_placeholder)
+            .build()
+    )
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(backgroundColor)

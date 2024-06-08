@@ -1,16 +1,17 @@
 package com.example.borutoapp.presentation.screens.search
 
-import androidx.compose.foundation.layout.padding
+import android.app.Activity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.borutoapp.presentation.common.ListContent
 import com.example.borutoapp.ui.theme.statusBar
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun SearchScreen(
@@ -19,8 +20,11 @@ fun SearchScreen(
 ) {
     val searchQuery by searchViewModel.searchQuery
     val heroes = searchViewModel.searchedHeroes.collectAsLazyPagingItems()
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(MaterialTheme.colors.statusBar)
+    val activity = LocalContext.current as Activity
+    val systemColor = MaterialTheme.colors.statusBar.toArgb()
+    SideEffect {
+        activity.window.statusBarColor = systemColor
+    }
     Scaffold(
         topBar = {
             SearchTopBar(
@@ -37,7 +41,7 @@ fun SearchScreen(
             )
         },
         content = { paddingValue->
-            val modifier = Modifier.padding(top = paddingValue.calculateTopPadding())
+            //val modifier = Modifier.padding(top = paddingValue.calculateTopPadding())
             ListContent(heroes = heroes, navController = navController)
         }
     )

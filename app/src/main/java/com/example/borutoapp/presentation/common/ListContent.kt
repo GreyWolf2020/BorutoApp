@@ -4,7 +4,16 @@ import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
@@ -16,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,15 +35,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemKey
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.borutoapp.R
 import com.example.borutoapp.domain.model.Hero
 import com.example.borutoapp.navigation.Screen
 import com.example.borutoapp.presentation.components.RatingWidget
 import com.example.borutoapp.presentation.components.ShimmerEffect
-import com.example.borutoapp.ui.theme.*
+import com.example.borutoapp.ui.theme.HERO_ITEM_HEIGHT
+import com.example.borutoapp.ui.theme.LARGE_PADDING
+import com.example.borutoapp.ui.theme.MEDIUM_PADDING
+import com.example.borutoapp.ui.theme.SMALL_PADDING
+import com.example.borutoapp.ui.theme.topAppBarContentColor
 import com.example.borutoapp.util.Constants.BASE_URL
 
 @Composable
@@ -50,12 +65,11 @@ fun ListContent(
             verticalArrangement = Arrangement.spacedBy(SMALL_PADDING)
         ) {
             items(
-                items = heroes,
-                key = { hero ->
-                    hero.id
-                }
-            ) { hero ->
-                hero?.let { myHero ->
+                count = heroes.itemCount,
+                key = heroes.itemKey { it.id }
+            ) {index ->
+                val hero = heroes[index]
+                hero ?.let { myHero ->
                     HeroItem(hero = myHero, navController = navController)
                 }
             }
@@ -97,10 +111,15 @@ fun HeroItem(
     hero: Hero,
     navController: NavHostController
 ) {
-    val heroPainter = rememberImagePainter(data = "$BASE_URL${hero.image}"){
-        placeholder(R.drawable.ic_placeholder)
-        error(R.drawable.ic_placeholder)
-    }
+
+    val heroPainter = rememberAsyncImagePainter(
+        model = ImageRequest
+            .Builder(LocalContext.current)
+            .data("$BASE_URL${hero.image}")
+            .placeholder(R.drawable.ic_placeholder)
+            .error(R.drawable.ic_placeholder)
+            .build()
+    )
 
     Box(
         modifier = Modifier
