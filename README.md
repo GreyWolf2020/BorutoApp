@@ -54,12 +54,12 @@ Imagery🎨 is loaded using [Coil](https://coil-kt.github.io/coil/) library.
 ## Installation
 1. Install and run the [Boruto Server.](https://github.com/GreyWolf2020/com.example.borutoserver.git)
 2. Setup a mobile hotspot on the android device where the android application will be installed and connect the server computer to the mobile hotspot.
-3. Get the IP address of the server computer from the list of connected devices in Mobile Hotspot Settings of the android device.
+3. Get the IP address of the server computer from the list of connected devices in Mobile Hotspot Settings of the android device, make sure that they are both in the same subnet.
 4. Clone the android application from the [repository.](https://github.com/GreyWolf2020/BorutoApp.git)
 5. Change the IP address of the IP_ADDRESS constant variable in [Constants.](app/src/main/java/com/example/borutoapp/util/Constants.kt):
 ```Kotlin
 object Constants {
-    const val IP_ADDRESS = "ipaddress" // assign the IP Address to IP_ADDRESS constant variable, the variable of String type.
+    const val IP_ADDRESS = "ipaddress" // assign the IP Address (server address as seen by the mobile device, hostspoting android device. Android device and server host should be in the same subnet) to IP_ADDRESS constant variable, the variable of String type.
 
     const val BASE_URL = "http://${IP_ADDRESS}:8080"
 }

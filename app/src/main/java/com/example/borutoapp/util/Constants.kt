@@ -9,7 +9,7 @@ object Constants {
     const val PREFERENCE_NAME = "boruto_preferences"
     const val PREFERENCES_KEY = "onboarding_completed"
 
-    const val IP_ADDRESS = "192.168.1.23" // assign the IP Address to IP_ADDRESS constant variable, the variable of String type.
+    const val IP_ADDRESS = "192.168.1.23" // assign the IP Address (server address as seen by the mobile device, hostspoting android device. Android device and server host should be in the same subnet) to IP_ADDRESS constant variable, the variable of String type.
 
     const val BASE_URL = "http://${IP_ADDRESS}:8080"
 
